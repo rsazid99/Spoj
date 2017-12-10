@@ -14,15 +14,15 @@ using namespace std;
 #define ff  first
 #define ss  second
 
-typedef pair<ll, int> ii;
+typedef pair<int, int> ii;
 typedef pair<int, ii> iii;
 
 int Set(int N, int pos) {return N = N | (1 << pos);}
 int reset(int N, int pos) {return N = N & ~ (1 << pos);}
 bool check(ll N, int pos) {return (bool) (N & (1LL << pos));}
 
-int n;
-ll a[maxn], b[maxn], d[maxn];
+int n, a, b, d;
+vector<iii> v;
 
 
 int main()
@@ -33,27 +33,39 @@ int main()
 
         while(t --){
                 scanf("%d", &n);
-                priority_queue<ii, vector<ii>, greater<ii> > pq;
+
                 for(int i = 1; i <= n; i ++){
-                        scanf("%lld %lld %lld", &a[i], &b[i], &d[i]);
-                        pq.push(ii(b[i] - d[i], i));
+                        scanf("%d %d %d", &a, &b, &d);
+                        v.push_back(iii(d, ii(b, a)));
                 }
+                sort(v.begin(), v.end());
 
-                long double ans = 0.00;
+                double ans = 0.00;
+                int Time = 0;
+                priority_queue<ii> pq;
+                for(int i = 0; i < n; i ++){
+                        Time += v[i].second.first;
+                        pq.push(ii(v[i].second.second, v[i].second.first));
+                        while(Time > v[i].first){
+                                int t = Time - v[i].first;
+                                ii u = pq.top();
+                                pq.pop();
 
-                while(!pq.empty()){
-                        ii u = pq.top();
-                        pq.pop();
-
-                        if(u.first <= 0) continue;
-                        else{
-                                ans += (long double) u.first / a[u.second];
+                                if(u.second >= t){
+                                        u.second -= t;
+                                        ans += (double) t / u.first;
+                                        Time = v[i].first;
+                                        pq.push(u);
+                                }
+                                else{
+                                        Time -= u.second;
+                                        ans += (double) u.second / u.first;
+                                        u.second = 0;
+                                }
                         }
                 }
-
-                printf("%.2Lf\n", ans);
-
-
+                printf("%.2f\n", ans);
+                v.clear();
 
         }
 
